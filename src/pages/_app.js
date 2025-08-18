@@ -1,5 +1,5 @@
 import "@/styles/globals.css";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function App({ Component, pageProps }) {
   const [loaded, setLoaded] = useState(false);
