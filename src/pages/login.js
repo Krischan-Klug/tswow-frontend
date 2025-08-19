@@ -22,11 +22,12 @@ export default function LoginPage() {
   const me = async () => {
     const res = await fetch("/api/me");
     const data = await res.json();
-    setMsg(
-      res.ok
-        ? { ok: true, text: JSON.stringify(data) }
-        : { ok: false, text: data.error }
-    );
+    if (res.ok) {
+      setMsg({ ok: true, text: JSON.stringify(data.account, null, 2) });
+      console.log(data); //REMOVE !!!!
+    } else {
+      setMsg({ ok: false, text: data.error || "not logged in" });
+    }
   };
 
   const logout = async () => {
@@ -66,7 +67,19 @@ export default function LoginPage() {
         <button onClick={me}>Who am I?</button>
         <button onClick={logout}>Logout</button>
       </div>
-      {msg && <p style={{ color: msg.ok ? "green" : "red" }}>{msg.text}</p>}
+      {msg && (
+        <pre
+          style={{
+            whiteSpace: "pre-wrap",
+            background: "#f4f4f4",
+            padding: 12,
+            borderRadius: 8,
+            marginTop: 12,
+          }}
+        >
+          <span style={{ color: msg.ok ? "green" : "red" }}>{msg.text}</span>
+        </pre>
+      )}
     </div>
   );
 }

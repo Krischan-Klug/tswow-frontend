@@ -20,10 +20,9 @@ const StyledRealmlist = styled.div`
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
-  height: 50vh;
   border: 1px solid var(--foreground);
   border-radius: 10px;
-  padding: 10px;
+  margin: 10px;
 `;
 
 const StyledText = styled.p`

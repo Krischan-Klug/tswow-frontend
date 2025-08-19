@@ -5,6 +5,7 @@ const StyledLink = styled(Link)`
   text-decoration: none;
   color: var(--foreground);
   font-size: 2rem;
+  margin: 10px;
 `;
 
 const StyledContentWrapper = styled.div`
@@ -17,19 +18,23 @@ const StyledContentWrapper = styled.div`
 
 const StyledLinkWrapper = styled.div`
   display: flex;
-  flex-direction: column;
-  justify-content: space-around;
+  flex-direction: row;
   align-items: center;
-  height: 50vh;
+  border: 1px solid var(--foreground);
+  border-radius: 10px;
+  padding: 10px;
 `;
 
 export default function Home() {
   return (
     <StyledContentWrapper>
       <h1>KKs Azeroth</h1>
+      <StyledLink href="/download">How to play</StyledLink>
       <StyledLinkWrapper>
         <StyledLink href="/register">Register</StyledLink>
-        <StyledLink href="/download">How to play</StyledLink>
+
+        <StyledLink href="/login">Login</StyledLink>
+        <StyledLink href="/profile">Profile</StyledLink>
       </StyledLinkWrapper>
     </StyledContentWrapper>
   );
