@@ -11,7 +11,6 @@ export default function RegisterPage() {
     setMessage(null);
 
     try {
-      // ✅ nur noch HTTPS same-origin → kein Mixed Content
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
