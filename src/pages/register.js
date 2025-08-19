@@ -11,7 +11,8 @@ export default function RegisterPage() {
     setMessage(null);
 
     try {
-      const res = await fetch("http://168.119.211.174:3001/register", {
+      // ✅ nur noch HTTPS same-origin → kein Mixed Content
+      const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password, email }),
@@ -19,14 +20,17 @@ export default function RegisterPage() {
 
       const data = await res.json();
       if (res.ok) {
-        setMessage({ type: "success", text: data.message });
+        setMessage({
+          type: "success",
+          text: data.message || "Account erstellt",
+        });
         setUsername("");
         setPassword("");
         setEmail("");
       } else {
         setMessage({ type: "error", text: data.error || "Fehler" });
       }
-    } catch (err) {
+    } catch {
       setMessage({ type: "error", text: "Server nicht erreichbar" });
     }
   };
