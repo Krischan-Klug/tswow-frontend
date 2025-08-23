@@ -1,19 +1,20 @@
-import { useState } from "react";
+// Realms.js
+import React from "react";
+import useRealmInfo from "../lib/useRealmInfo";
 
 export default function Realms() {
-  const [realms, setRealms] = useState([]);
-  const handleRealmInfo = async (realmId) => {
-    const r = await fetch("/api/realm", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: realmId }),
-    });
-    setRealms(await r.json());
-  };
+  const { realms, loading, error } = useRealmInfo("1");
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <div>
-      <button onClick={() => handleRealmInfo("1")}>Log</button>
       <pre>{JSON.stringify(realms, null, 2)}</pre>
     </div>
   );
