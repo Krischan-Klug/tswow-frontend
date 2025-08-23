@@ -30,6 +30,7 @@ export default function Home() {
     <StyledContentWrapper>
       <h1>KKs Azeroth</h1>
       <StyledLink href="/download">How to play</StyledLink>
+      <StyledLink href="/realms">Realms</StyledLink>
       <StyledLinkWrapper>
         <StyledLink href="/register">Register</StyledLink>
 
