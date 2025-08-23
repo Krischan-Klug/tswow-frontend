@@ -1,5 +1,6 @@
 import Link from "next/link";
 import styled from "styled-components";
+import useRealmInfo from "../lib/useRealmInfo";
 
 const StyledLink = styled(Link)`
   text-decoration: none;
@@ -32,14 +33,24 @@ const StyledText = styled.p`
 `;
 
 export default function Download() {
+  const { realm, loading, error } = useRealmInfo(1);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
   return (
     <StyledContentWrapper>
       <h1>Download</h1>
-      <StyledLink href="https://gofile.io/d/Cjz7aN">Click here</StyledLink>
+      <StyledLink href="https://google.com">Click here</StyledLink>
 
       <StyledRealmlist>
         <h3>Realmlist:</h3>
-        <StyledText>set realmlist 168.119.211.174</StyledText>
+        <StyledText>{"set realmlist " + realm.address}</StyledText>
       </StyledRealmlist>
     </StyledContentWrapper>
   );

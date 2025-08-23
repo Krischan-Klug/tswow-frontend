@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 
 const useRealmInfo = (realmId) => {
-  const [realms, setRealms] = useState([]);
+  const [realm, setRealm] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -16,7 +16,7 @@ const useRealmInfo = (realmId) => {
           body: JSON.stringify({ id: realmId }),
         });
         const data = await response.json();
-        setRealms(data);
+        setRealm(data);
       } catch (error) {
         setError(error);
       } finally {
@@ -26,7 +26,7 @@ const useRealmInfo = (realmId) => {
     fetchRealm();
   }, [realmId]);
 
-  return { realms, loading, error };
+  return { realm, loading, error };
 };
 
 export default useRealmInfo;

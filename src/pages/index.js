@@ -28,7 +28,6 @@ const StyledLinkWrapper = styled.div`
 export default function Home() {
   return (
     <StyledContentWrapper>
-      <h1>KKs Azeroth</h1>
       <StyledLink href="/download">How to play</StyledLink>
       <StyledLink href="/realms">Realms</StyledLink>
       <StyledLinkWrapper>

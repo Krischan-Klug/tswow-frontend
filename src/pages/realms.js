@@ -3,8 +3,7 @@ import React from "react";
 import useRealmInfo from "../lib/useRealmInfo";
 
 export default function Realms() {
-  const { realms, loading, error } = useRealmInfo("1");
-
+  const { realm, loading, error } = useRealmInfo(1);
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -15,7 +14,7 @@ export default function Realms() {
 
   return (
     <div>
-      <pre>{JSON.stringify(realms, null, 2)}</pre>
+      <pre>{JSON.stringify(realm, null, 2)}</pre>
     </div>
   );
 }
