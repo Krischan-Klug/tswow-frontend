@@ -1,5 +1,6 @@
 import Link from "next/link";
 import styled from "styled-components";
+import { useAuth } from "@/lib/useAuth";
 
 const StyledLink = styled(Link)`
   text-decoration: none;
@@ -26,15 +27,16 @@ const StyledLinkWrapper = styled.div`
 `;
 
 export default function Home() {
+  const { user } = useAuth();
   return (
     <StyledContentWrapper>
       <StyledLink href="/download">How to play</StyledLink>
       <StyledLink href="/realms">Realms</StyledLink>
       <StyledLinkWrapper>
-        <StyledLink href="/register">Register</StyledLink>
-
-        <StyledLink href="/login">Login</StyledLink>
-        <StyledLink href="/profile">Profile</StyledLink>
+        {!user && <StyledLink href="/register">Register</StyledLink>}
+        {!user && <StyledLink href="/login">Login</StyledLink>}
+        {user && <StyledLink href="/profile">Profile</StyledLink>}
+        {user && <StyledLink href="/api/logout">Logout</StyledLink>}
       </StyledLinkWrapper>
     </StyledContentWrapper>
   );
