@@ -28,6 +28,11 @@ const StyledLinkWrapper = styled.div`
 
 export default function Home() {
   const { user } = useAuth();
+
+  const logout = async () => {
+    await fetch("/api/logout");
+    window.location.href = "/";
+  };
   return (
     <StyledContentWrapper>
       <StyledLink href="/download">How to play</StyledLink>
@@ -36,7 +41,7 @@ export default function Home() {
         {!user && <StyledLink href="/register">Register</StyledLink>}
         {!user && <StyledLink href="/login">Login</StyledLink>}
         {user && <StyledLink href="/profile">Profile</StyledLink>}
-        {user && <StyledLink href="/api/logout">Logout</StyledLink>}
+        {user && <button onClick={logout}>Logout</button>}
       </StyledLinkWrapper>
     </StyledContentWrapper>
   );

@@ -1,4 +1,3 @@
-// pages/login.js
 import { useState } from "react";
 
 export default function LoginPage() {
@@ -24,7 +23,6 @@ export default function LoginPage() {
     const data = await res.json();
     if (res.ok) {
       setMsg({ ok: true, text: JSON.stringify(data.account, null, 2) });
-      console.log(data); //REMOVE !!!!
     } else {
       setMsg({ ok: false, text: data.error || "not logged in" });
     }
@@ -40,7 +38,6 @@ export default function LoginPage() {
       style={{
         maxWidth: 360,
         margin: "40px auto",
-        fontFamily: "Arial, sans-serif",
       }}
     >
       <h1>Login</h1>
