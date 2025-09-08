@@ -1,4 +1,3 @@
-// useRealm.js
 import { useState, useEffect } from "react";
 
 const useRealmInfo = (realmId) => {
