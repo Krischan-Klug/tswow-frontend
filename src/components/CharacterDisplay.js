@@ -1,7 +1,7 @@
 import { useAuth } from "../lib/useAuth";
 import { useEffect, useState } from "react";
 
-export default function User() {
+export default function CharacterDisplay() {
   const { user, loading } = useAuth();
   const [characters, setCharacters] = useState([]);
   const [error, setError] = useState(null);
