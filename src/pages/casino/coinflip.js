@@ -1,103 +1,38 @@
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/router";
-import { useAuth } from "@/lib/useAuth";
-
-function toPretty(copper) {
-  const g = Math.floor(copper / 10000);
-  const s = Math.floor((copper % 10000) / 100);
-  const c = copper % 100;
-  return { gold: g, silver: s, copper: c };
-}
-
-function formatPretty(pretty) {
-  return `${pretty.gold}g ${pretty.silver}s ${pretty.copper}c`;
-}
+import { useMemo, useState } from "react";
+import useRequireAuth from "@/lib/useRequireAuth";
+import useCharacters from "@/lib/useCharacters";
+import { jsonPost } from "@/lib/api";
+import { toCopper } from "@/lib/currency";
+import Row from "@/components/ui/Row";
+import Button from "@/components/ui/Button";
+import Alert from "@/components/ui/Alert";
+import CharacterSelect from "@/components/casino/CharacterSelect";
+import WagerFields from "@/components/casino/WagerFields";
+import CoinChoice from "@/components/casino/CoinChoice";
+import ResultPanel from "@/components/casino/ResultPanel";
 
 export default function CoinflipPage() {
-  const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading } = useRequireAuth("/casino/coinflip");
 
-  const [characters, setCharacters] = useState([]);
-  const [fetching, setFetching] = useState(false);
-  const [fetchError, setFetchError] = useState(null);
+  const { characters, loading: fetching, error: fetchError } = useCharacters({
+    enabled: !!user,
+  });
   const [selectedIdx, setSelectedIdx] = useState(0);
 
   const [gold, setGold] = useState(0);
   const [silver, setSilver] = useState(0);
   const [copper, setCopper] = useState(0);
-
   const [choice, setChoice] = useState("heads");
+
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [result, setResult] = useState(null);
 
   const selectedChar = characters[selectedIdx] || null;
-
-  const wagerCopper = useMemo(() => {
-    const g = Number.isFinite(+gold) ? Math.max(0, parseInt(gold, 10) || 0) : 0;
-    const s = Number.isFinite(+silver)
-      ? Math.max(0, Math.min(99, parseInt(silver, 10) || 0))
-      : 0;
-    const c = Number.isFinite(+copper)
-      ? Math.max(0, Math.min(99, parseInt(copper, 10) || 0))
-      : 0;
-    return g * 10000 + s * 100 + c;
-  }, [gold, silver, copper]);
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace("/login?next=/casino/coinflip");
-    }
-  }, [loading, user, router]);
-
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    (async () => {
-      setFetching(true);
-      setFetchError(null);
-      try {
-        const r = await fetch("/api/casino/characters");
-        const data = await r.json();
-        if (!r.ok) throw new Error(data.error || "Failed to load characters");
-        if (!cancelled) {
-          const chars = (data.characters || []).map((c, idx) => {
-            const realmId =
-              c.realmId ?? c.realm_id ?? c.realm?.id ?? c.realm ?? null;
-            const guid =
-              c.guid ?? c.characterGuid ?? c.character_guid ?? c.id ?? null;
-            const realmName =
-              c.realmName ?? c.realm_name ?? c.realm?.name ?? String(c.realm ?? "");
-            const name = c.name ?? c.charName ?? c.characterName ?? "";
-            const balanceCopper = Number(
-              c.balanceCopper ?? c.balance_copper ?? c.balance ?? 0
-            );
-            const balancePretty = c.balancePretty || toPretty(balanceCopper);
-            const _key = `${realmId ?? "r"}:${guid ?? "g"}:${name || idx}`;
-            return {
-              ...c,
-              realmId,
-              guid,
-              realmName,
-              name,
-              balanceCopper,
-              balancePretty,
-              _key,
-            };
-          });
-          setCharacters(chars);
-          setSelectedIdx(0);
-        }
-      } catch (e) {
-        if (!cancelled) setFetchError(e);
-      } finally {
-        if (!cancelled) setFetching(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
+  const wagerCopper = useMemo(
+    () => toCopper({ gold, silver, copper }),
+    [gold, silver, copper]
+  );
 
   const canSubmit =
     !!selectedChar &&
@@ -119,33 +54,8 @@ export default function CoinflipPage() {
         wagerCopper,
         choice,
       };
-      const r = await fetch("/api/casino/coin-flip", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await r.json();
-      if (!r.ok) throw new Error(data.error || "Request failed");
-      setResult(data.result || null);
-      // Update local balance
-      if (data?.result) {
-        const { realmId, characterGuid, updatedBalance, updatedBalancePretty } =
-          data.result;
-        setCharacters((prev) =>
-          prev.map((ch) => {
-            if (ch.realmId === realmId && ch.guid === characterGuid) {
-              const pretty =
-                updatedBalancePretty || toPretty(Number(updatedBalance || 0));
-              return {
-                ...ch,
-                balanceCopper: Number(updatedBalance || 0),
-                balancePretty: pretty,
-              };
-            }
-            return ch;
-          })
-        );
-      }
+      const data = await jsonPost("/api/casino/coin-flip", body);
+      setResult(data);
     } catch (e) {
       setSubmitError(e);
     } finally {
@@ -153,173 +63,62 @@ export default function CoinflipPage() {
     }
   };
 
-  if (loading || fetching) {
-    return (
-      <div style={{ maxWidth: 640, margin: "40px auto" }}>
-        <h1>Casino – Coinflip</h1>
-        <p>Loading…</p>
-      </div>
-    );
-  }
-
-  if (!user) return null;
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <div>Please log in first.</div>;
 
   return (
-    <div style={{ maxWidth: 640, margin: "40px auto" }}>
-      <h1>Casino – Coinflip</h1>
-
-      {fetchError && (
-        <div
-          style={{
-            background: "#ffe6e6",
-            border: "1px solid #ffb3b3",
-            padding: 12,
-            borderRadius: 8,
-            marginBottom: 12,
-          }}
-        >
-          <strong style={{ color: "#b30000" }}>Error:</strong>{" "}
-          {String(fetchError.message || fetchError)}
-        </div>
-      )}
-
-      <form
-        onSubmit={onSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: 16 }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <label htmlFor="charSel">Character</label>
-          <select
-            id="charSel"
+    <div style={{ maxWidth: 720, margin: "40px auto" }}>
+      <h1>Coin Flip</h1>
+      <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <label htmlFor="character">Character</label>
+          <CharacterSelect
+            characters={characters}
             value={selectedIdx}
-            onChange={(e) => setSelectedIdx(parseInt(e.target.value, 10))}
-          >
-            {characters.map((c, idx) => (
-              <option key={c._key || `${c.realmId ?? 'r'}:${c.guid ?? 'g'}:${idx}`} value={idx}>
-                {(c.realmName || c.realm?.name || "Realm")} – {(c.name || `#${idx}`)} ({formatPretty(c.balancePretty)})
-              </option>
-            ))}
-          </select>
+            onChange={setSelectedIdx}
+            disabled={fetching}
+          />
         </div>
 
-        <div style={{ display: "flex", gap: 12 }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <label htmlFor="gold">Gold</label>
-            <input
-              id="gold"
-              type="number"
-              min={0}
-              value={gold}
-              onChange={(e) => setGold(e.target.value)}
-            />
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <label htmlFor="silver">Silver</label>
-            <input
-              id="silver"
-              type="number"
-              min={0}
-              max={99}
-              value={silver}
-              onChange={(e) => setSilver(e.target.value)}
-            />
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <label htmlFor="copper">Copper</label>
-            <input
-              id="copper"
-              type="number"
-              min={0}
-              max={99}
-              value={copper}
-              onChange={(e) => setCopper(e.target.value)}
-            />
-          </div>
-          <div
-            style={{ display: "flex", alignItems: "flex-end", marginLeft: 8 }}
-          >
-            <div style={{ color: "#666" }}>
-              = {wagerCopper} copper ({formatPretty(toPretty(wagerCopper))})
-            </div>
-          </div>
-        </div>
+        <WagerFields
+          gold={gold}
+          silver={silver}
+          copper={copper}
+          onChange={({ gold, silver, copper }) => {
+            setGold(gold);
+            setSilver(silver);
+            setCopper(copper);
+          }}
+        />
 
-        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-          <label>
-            <input
-              type="radio"
-              name="choice"
-              value="heads"
-              checked={choice === "heads"}
-              onChange={() => setChoice("heads")}
-            />
-            Heads
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="choice"
-              value="tails"
-              checked={choice === "tails"}
-              onChange={() => setChoice("tails")}
-            />
-            Tails
-          </label>
-        </div>
+        <CoinChoice value={choice} onChange={setChoice} />
 
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <button type="submit" disabled={!canSubmit}>
+        <Row>
+          <Button type="submit" disabled={!canSubmit}>
             {submitting ? "Flipping…" : "Flip Coin"}
-          </button>
+          </Button>
           {!canSubmit && (
-            <span style={{ color: "#666" }}>
+            <span style={{ color: "var(--muted)" }}>
               Select character and enter wager
             </span>
           )}
-        </div>
+        </Row>
       </form>
 
-      {submitError && (
-        <div
-          style={{
-            background: "#ffe6e6",
-            border: "1px solid #ffb3b3",
-            padding: 12,
-            borderRadius: 8,
-            marginTop: 16,
-          }}
-        >
-          <strong style={{ color: "#b30000" }}>Error:</strong>{" "}
-          {String(submitError.message || submitError)}
-        </div>
+      {fetchError && (
+        <Alert $variant="error" style={{ marginTop: 16 }}>
+          <strong>Error:</strong> {String(fetchError.message || fetchError)}
+        </Alert>
       )}
 
-      {result && (
-        <div
-          style={{
-            background: result.win ? "#e6ffed" : "#fff7e6",
-            border: `1px solid ${result.win ? "#8ce1a5" : "#ffd699"}`,
-            padding: 12,
-            borderRadius: 8,
-            marginTop: 16,
-          }}
-        >
-          <div style={{ fontWeight: 600, marginBottom: 8 }}>
-            {result.win ? "You won! 🎉" : "You lost."}
-          </div>
-          <div>Outcome: {result.outcome}</div>
-          <div>Choice: {result.choice}</div>
-          <div>
-            Wager: {formatPretty(toPretty(Number(result.wagerCopper || 0)))}
-          </div>
-          <div>
-            Previous balance: {formatPretty(result.previousBalancePretty || toPretty(Number(result.previousBalance || 0)))}
-          </div>
-          <div>
-            Updated balance: {formatPretty(result.updatedBalancePretty || toPretty(Number(result.updatedBalance || 0)))}
-          </div>
-        </div>
+      {submitError && (
+        <Alert $variant="error" style={{ marginTop: 16 }}>
+          <strong>Error:</strong> {String(submitError.message || submitError)}
+        </Alert>
       )}
+
+      <ResultPanel result={result} />
     </div>
   );
 }
+

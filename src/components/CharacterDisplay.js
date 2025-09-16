@@ -1,5 +1,6 @@
 import { useAuth } from "../lib/useAuth";
 import { useEffect, useState } from "react";
+import Card from "@/components/ui/Card";
 
 export default function CharacterDisplay() {
   const { user, loading } = useAuth();
@@ -32,7 +33,9 @@ export default function CharacterDisplay() {
   return (
     <div style={{ maxWidth: 480, margin: "40px auto" }}>
       <h1>Your Characters</h1>
-      <pre>{JSON.stringify(characters, null, 2)}</pre>
+      <Card>
+        <pre style={{ margin: 0 }}>{JSON.stringify(characters, null, 2)}</pre>
+      </Card>
     </div>
   );
 }

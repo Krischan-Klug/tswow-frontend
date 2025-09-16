@@ -1,5 +1,6 @@
 import { useAuth } from "../lib/useAuth";
 import CharacterDisplay from "@/components/CharacterDisplay";
+import Card from "@/components/ui/Card";
 
 export default function Profile() {
   const { user, loading } = useAuth();
@@ -9,7 +10,9 @@ export default function Profile() {
     <>
       <div style={{ maxWidth: 480, margin: "40px auto" }}>
         <h1>Profile</h1>
-        <pre>{JSON.stringify(user, null, 2)}</pre>
+        <Card>
+          <pre style={{ margin: 0 }}>{JSON.stringify(user, null, 2)}</pre>
+        </Card>
       </div>
       <CharacterDisplay />
     </>
