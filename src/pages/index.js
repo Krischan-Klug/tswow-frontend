@@ -41,6 +41,7 @@ export default function Home() {
         {!user && <StyledLink href="/register">Register</StyledLink>}
         {!user && <StyledLink href="/login">Login</StyledLink>}
         {user && <StyledLink href="/profile">Profile</StyledLink>}
+        {user && <StyledLink href="/casino">Casino</StyledLink>}
         {user && <button onClick={logout}>Logout</button>}
       </StyledLinkWrapper>
     </StyledContentWrapper>
