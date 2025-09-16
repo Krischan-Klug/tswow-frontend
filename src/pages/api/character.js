@@ -13,7 +13,11 @@ export default async function handler(req, res) {
   try {
     const r = await fetch(upstream, {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(req.body || {}),
     });
     const data = await r.json().catch(() => ({}));
     return res.status(r.status).json(data);

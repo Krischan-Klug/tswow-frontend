@@ -32,6 +32,7 @@ export default function Casino() {
         <h1>Games</h1>
         <StyledGameList>
           <Link href={"/casino/coinflip"}>Coinflip</Link>
+          <Link href={"/casino/twopick"}>Two Pick</Link>
         </StyledGameList>
       </StyledContentWrapper>
     </>
