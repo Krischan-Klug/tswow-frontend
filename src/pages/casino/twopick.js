@@ -12,7 +12,6 @@ import CharacterSelect from "@/components/casino/CharacterSelect";
 import WagerFields from "@/components/casino/WagerFields";
 import TwoPickGrid from "@/components/casino/TwoPickGrid";
 import ResultPanel from "@/components/casino/ResultPanel";
-import { normalizeSide } from "@/lib/coin";
 
 export default function TwoPickPage() {
   const { user, loading } = useRequireAuth("/casino/twopick");
@@ -91,9 +90,8 @@ export default function TwoPickPage() {
   if (loading) return <div>Loading...</div>;
   if (!user) return <div>Please log in first.</div>;
 
-  const nChoice = normalizeSide(choice);
-  const pickedSide = nChoice === "heads" ? "left" : nChoice === "tails" ? "right" : undefined;
-  const out = normalizeSide(result?.outcome);
+  const pickedSide = choice === "heads" ? "left" : choice === "tails" ? "right" : undefined;
+  const out = result?.outcome;
   const correctSide = out === "heads" ? "left" : out === "tails" ? "right" : undefined;
 
   return (
