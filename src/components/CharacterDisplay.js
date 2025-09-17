@@ -28,7 +28,7 @@ export default function CharacterDisplay() {
     })();
   }, [user]);
 
-  if (loading) return <p>Loading…</p>;
+  if (loading) return <p>Loading...</p>;
   if (!user) return <p>Please log in first.</p>;
   if (error) return <p>Error loading characters.</p>;
 
@@ -41,3 +41,4 @@ export default function CharacterDisplay() {
     </Container>
   );
 }
+

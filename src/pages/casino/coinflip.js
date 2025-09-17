@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 import useRequireAuth from "@/lib/useRequireAuth";
 import useCharacters from "@/lib/useCharacters";
 import { jsonPost } from "@/lib/api";
@@ -17,7 +17,7 @@ import ResultPanel from "@/components/casino/ResultPanel";
 export default function CoinflipPage() {
   const { user, loading } = useRequireAuth("/casino/coinflip");
 
-  const { characters, loading: fetching, error: fetchError } = useCharacters({
+  const { characters, loading: fetching, error: fetchError, refresh, updateBalance } = useCharacters({
     enabled: !!user,
   });
   const [selectedIdx, setSelectedIdx] = useState(0);
@@ -30,8 +30,21 @@ export default function CoinflipPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [result, setResult] = useState(null);
+  const [round, setRound] = useState(0);
 
   const selectedChar = characters[selectedIdx] || null;
+  const selectedRef = useRef(null);
+  useEffect(() => {
+    if (selectedChar) {
+      selectedRef.current = { realmId: selectedChar.realmId, guid: selectedChar.guid };
+    }
+  }, [selectedChar]);
+  useEffect(() => {
+    const id = selectedRef.current;
+    if (!id || !characters?.length) return;
+    const idx = characters.findIndex((c) => c.realmId === id.realmId && c.guid === id.guid);
+    if (idx >= 0 && idx !== selectedIdx) setSelectedIdx(idx);
+  }, [characters]);
   const wagerCopper = useMemo(
     () => toCopper({ gold, silver, copper }),
     [gold, silver, copper]
@@ -58,7 +71,15 @@ export default function CoinflipPage() {
         choice,
       };
       const data = await jsonPost("/api/casino/coin-flip", body);
-      setResult(data);
+      const res = data?.result || data;
+      setResult(res);
+      setRound((r) => r + 1);
+      const updated = Number(res.updatedBalance);
+      if (selectedChar && Number.isFinite(updated)) {
+        updateBalance?.(selectedChar.realmId, selectedChar.guid, updated);
+      } else {
+        refresh?.();
+      }
     } catch (e) {
       setSubmitError(e);
     } finally {
@@ -99,11 +120,9 @@ export default function CoinflipPage() {
 
           <Row>
             <Button type="submit" disabled={!canSubmit}>
-              {submitting ? "Flipping…" : "Flip Coin"}
+              {submitting ? "Flipping..." : "Flip Coin"}
             </Button>
-            {!canSubmit && (
-              <Muted>Select character and enter wager</Muted>
-            )}
+            {!canSubmit && <Muted>Select character and enter wager</Muted>}
           </Row>
         </Column>
 
@@ -119,7 +138,7 @@ export default function CoinflipPage() {
           </Alert>
         )}
 
-        <ResultPanel result={result} />
+        <ResultPanel key={round} result={result} playerChoice={choice} />
       </Column>
     </Container>
   );

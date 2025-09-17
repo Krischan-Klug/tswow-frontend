@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 import useRequireAuth from "@/lib/useRequireAuth";
 import useCharacters from "@/lib/useCharacters";
 import { jsonPost } from "@/lib/api";
@@ -12,10 +12,11 @@ import CharacterSelect from "@/components/casino/CharacterSelect";
 import WagerFields from "@/components/casino/WagerFields";
 import TwoPickGrid from "@/components/casino/TwoPickGrid";
 import ResultPanel from "@/components/casino/ResultPanel";
+import { normalizeSide } from "@/lib/coin";
 
 export default function TwoPickPage() {
   const { user, loading } = useRequireAuth("/casino/twopick");
-  const { characters, loading: fetching, error: fetchError } = useCharacters({
+  const { characters, loading: fetching, error: fetchError, refresh, updateBalance } = useCharacters({
     enabled: !!user,
   });
   const [selectedIdx, setSelectedIdx] = useState(0);
@@ -28,8 +29,22 @@ export default function TwoPickPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [result, setResult] = useState(null);
+  const [round, setRound] = useState(0);
 
   const selectedChar = characters[selectedIdx] || null;
+  const selectedRef = useRef(null);
+  useEffect(() => {
+    if (selectedChar) {
+      selectedRef.current = { realmId: selectedChar.realmId, guid: selectedChar.guid };
+    }
+  }, [selectedChar]);
+  useEffect(() => {
+    const id = selectedRef.current;
+    if (!id || !characters?.length) return;
+    const idx = characters.findIndex((c) => c.realmId === id.realmId && c.guid === id.guid);
+    if (idx >= 0 && idx !== selectedIdx) setSelectedIdx(idx);
+  }, [characters]);
+
   const wagerCopper = useMemo(
     () => toCopper({ gold, silver, copper }),
     [gold, silver, copper]
@@ -57,7 +72,15 @@ export default function TwoPickPage() {
         choice: picked, // reuse coin-flip API: "heads" | "tails"
       };
       const data = await jsonPost("/api/casino/coin-flip", body);
-      setResult(data);
+      const res = data?.result || data;
+      setResult(res);
+      setRound((r) => r + 1);
+      const updated = Number(res.updatedBalance);
+      if (selectedChar && Number.isFinite(updated)) {
+        updateBalance?.(selectedChar.realmId, selectedChar.guid, updated);
+      } else {
+        refresh?.();
+      }
     } catch (e) {
       setSubmitError(e);
     } finally {
@@ -68,12 +91,10 @@ export default function TwoPickPage() {
   if (loading) return <div>Loading...</div>;
   if (!user) return <div>Please log in first.</div>;
 
-  const pickedSide = choice === "heads" ? "left" : choice === "tails" ? "right" : undefined;
-  const correctSide = result
-    ? result.outcome === "heads"
-      ? "left"
-      : "right"
-    : undefined;
+  const nChoice = normalizeSide(choice);
+  const pickedSide = nChoice === "heads" ? "left" : nChoice === "tails" ? "right" : undefined;
+  const out = normalizeSide(result?.outcome);
+  const correctSide = out === "heads" ? "left" : out === "tails" ? "right" : undefined;
 
   return (
     <Container $max={720}>
@@ -102,10 +123,11 @@ export default function TwoPickPage() {
           />
 
           <Muted>
-            Wähle eines der zwei Bilder. Aktuell sind Platzhalter – die Bilder kannst du später einfügen.
+            Waehle eines der zwei Bilder. Aktuell sind Platzhalter - die Bilder kannst du spaeter einfuegen.
           </Muted>
 
           <TwoPickGrid
+            key={round}
             canSubmit={canSubmit}
             pickedSide={pickedSide}
             correctSide={correctSide}
@@ -113,9 +135,7 @@ export default function TwoPickPage() {
           />
 
           {!canSubmit && (
-            <Muted>
-              Charakter wählen und Einsatz eingeben, um zu spielen.
-            </Muted>
+            <Muted>Charakter waehlen und Einsatz eingeben, um zu spielen.</Muted>
           )}
         </Column>
 
@@ -130,7 +150,7 @@ export default function TwoPickPage() {
           </Alert>
         )}
 
-        <ResultPanel result={result} />
+        <ResultPanel key={round} result={result} playerChoice={choice} />
       </Column>
     </Container>
   );

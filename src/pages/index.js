@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { useAuth } from "@/lib/useAuth";
 import ContentWrapper from "@/components/ui/ContentWrapper";
 import NavLink from "@/components/ui/NavLink";

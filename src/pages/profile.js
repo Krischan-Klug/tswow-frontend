@@ -6,7 +6,7 @@ import { Pre } from "@/components/ui/Text";
 
 export default function Profile() {
   const { user, loading } = useAuth();
-  if (loading) return <p>Loading…</p>;
+  if (loading) return <p>Loading...</p>;
   if (!user) return <p>Please log in first.</p>;
   return (
     <>
@@ -20,3 +20,4 @@ export default function Profile() {
     </>
   );
 }
+

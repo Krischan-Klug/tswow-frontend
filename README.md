@@ -1,42 +1,48 @@
 # TSWoW Frontend
 
-This repository contains the Next.js based front-end for the TSWoW project. It relies on the [TSWoW Backend](https://github.com/Krischan-Klug/tswow-backend) for authentication and data.
+Next.js-Frontend für TSWoW. Nutzt das TSWoW-Backend für Authentifizierung und Daten.
 
-## Prerequisites
+## Voraussetzungen
 
-- Node.js (version 18 or later)
-- A running instance of the TSWoW Backend or access to the API endpoints
+- Node.js 18+
+- Laufendes Backend oder erreichbare API-Endpunkte
 
-## Getting Started
+## Schnellstart
 
-1. Install dependencies:
+1. Abhängigkeiten installieren:
    ```bash
    npm install
    ```
-2. Copy `.env.local.example` to `.env.local` and adjust the URLs if your backend is not running at `http://127.0.0.1:3001`.
-3. Start the development server:
+2. `.env.local.example` nach `.env.local` kopieren und bei Bedarf URLs anpassen (Standard: `http://127.0.0.1:3001`).
+3. Dev-Server starten:
    ```bash
    npm run dev
    ```
-4. Open [http://localhost:3000](http://localhost:3000) in your browser to view the app.
+4. App öffnen: `http://localhost:3000`
 
-## Environment Variables
+## Umgebungsvariablen
 
-Copy `.env.local.example` to `.env.local` to provide the following variables:
+In `.env.local` können folgende Variablen gesetzt werden (Default siehe Klammern):
 
-- `BACKEND_URL_REGISTER` – URL to the backend register endpoint (default: `http://127.0.0.1:3001/auth/register`).
-- `BACKEND_URL_LOGIN` – URL to the backend login endpoint (default: `http://127.0.0.1:3001/auth/login`).
-- `BACKEND_URL_ME` – URL to the backend `me` endpoint (default: `http://127.0.0.1:3001/auth/me`).
-- `BACKEND_URL_REALM` – URL to the backend realm info endpoint (default: `http://127.0.0.1:3001/realm/info`).
+- `BACKEND_URL_REGISTER` (http://127.0.0.1:3001/auth/register)
+- `BACKEND_URL_LOGIN` (http://127.0.0.1:3001/auth/login)
+- `BACKEND_URL_ME` (http://127.0.0.1:3001/auth/me)
+- `BACKEND_URL_REALM` (http://127.0.0.1:3001/realm/info)
 
-## Available Scripts
+## Skripte
 
-- `npm run dev` – Run the development server.
-- `npm run build` – Build the application for production.
-- `npm run start` – Start the production build.
-- `npm run lint` – Run linting checks.
+- `npm run dev` – Entwicklungsserver
+- `npm run build` – Produktion bauen
+- `npm run start` – Produktion starten
+- `npm run lint` – Linting
 
-## Related Projects
+## UI-Komponenten
 
-- [TSWoW Backend](https://github.com/Krischan-Klug/tswow-backend) – the companion backend service powering this front-end.
+Gemeinsame Bausteine unter `src/components/ui/*` (styled-components):
 
+- Layout: `Container`, `ContentWrapper`, `Row`, `Column`, `Toolbar`, `Grid`
+- Controls: `Button`, `Input`, `Select`, `NavLink`
+- Feedback: `Alert`, `Card`, Text: `Muted`, `Pre`, `Center`
+- Auth: `LogoutButton` (`src/components/auth/LogoutButton.js`)
+
+Design-Tokens (Farben/Abstände/Radius/Schatten) unter `src/styles/globals.css`.
