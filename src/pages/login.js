@@ -2,6 +2,12 @@ import { useState } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import Container from "@/components/ui/Container";
+import Column from "@/components/ui/Column";
+import Row from "@/components/ui/Row";
+import Alert from "@/components/ui/Alert";
+import { Pre } from "@/components/ui/Text";
+import LogoutButton from "@/components/auth/LogoutButton";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -31,16 +37,13 @@ export default function LoginPage() {
     }
   };
 
-  const logout = async () => {
-    await fetch("/api/logout");
-    setMsg({ ok: true, text: "Logged out" });
-  };
+  const onLoggedOut = () => setMsg({ ok: true, text: "Logged out" });
 
   return (
-    <div style={{ maxWidth: 420, margin: "40px auto" }}>
+    <Container $max={420}>
       <h1>Login</h1>
       <Card>
-        <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <Column as="form" onSubmit={submit} $gap="var(--space-3)">
           <Input
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -55,17 +58,19 @@ export default function LoginPage() {
             required
           />
           <Button type="submit">Login</Button>
-        </form>
-        <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
-          <Button type="button" onClick={me}>Who am I?</Button>
-          <Button type="button" onClick={logout}>Logout</Button>
-        </div>
-        {msg && (
-          <pre style={{ whiteSpace: "pre-wrap", marginTop: 12 }}>
-            <span style={{ color: msg.ok ? "var(--success)" : "var(--danger)" }}>{msg.text}</span>
-          </pre>
-        )}
+        </Column>
+        <Column $gap="var(--space-3)">
+          <Row $gap="var(--space-2)">
+            <Button type="button" onClick={me}>Who am I?</Button>
+            <LogoutButton onLoggedOut={onLoggedOut} />
+          </Row>
+          {msg && (
+            <Alert $variant={msg.ok ? "success" : "error"}>
+              <Pre $wrap>{msg.text}</Pre>
+            </Alert>
+          )}
+        </Column>
       </Card>
-    </div>
+    </Container>
   );
 }

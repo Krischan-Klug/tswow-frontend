@@ -2,7 +2,7 @@ import Row from "@/components/ui/Row";
 
 export default function CoinChoice({ value = "heads", onChange }) {
   return (
-    <Row style={{ gap: 16, alignItems: "center" }}>
+    <Row $gap="var(--space-4)" $align="center">
       <label>
         <input
           type="radio"
@@ -26,4 +26,3 @@ export default function CoinChoice({ value = "heads", onChange }) {
     </Row>
   );
 }
-

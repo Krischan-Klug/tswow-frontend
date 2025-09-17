@@ -1,4 +1,5 @@
-import Card from "@/components/ui/Card";
+import Alert from "@/components/ui/Alert";
+import styled from "styled-components";
 import { formatPretty, toPretty } from "@/lib/currency";
 
 export default function ResultPanel({ result }) {
@@ -12,19 +13,18 @@ export default function ResultPanel({ result }) {
   );
 
   return (
-    <Card style={{
-      background: result.win ? "#e6ffed" : "#fff7e6",
-      border: `1px solid ${result.win ? "#8ce1a5" : "#ffd699"}`,
-    }}>
-      <div style={{ fontWeight: 600, marginBottom: 8 }}>
-        {result.win ? "You won!" : "You lost."}
-      </div>
+    <Alert $variant={result.win ? "success" : "warning"}>
+      <Title>{result.win ? "You won!" : "You lost."}</Title>
       <div>Outcome: {result.outcome}</div>
       {result.choice && <div>Choice: {result.choice}</div>}
       <div>Wager: {wager}</div>
       <div>Previous balance: {prev}</div>
       <div>Updated balance: {next}</div>
-    </Card>
+    </Alert>
   );
 }
 
+const Title = styled.div`
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+`;

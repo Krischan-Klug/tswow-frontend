@@ -6,6 +6,9 @@ import { toCopper } from "@/lib/currency";
 import Row from "@/components/ui/Row";
 import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
+import Column from "@/components/ui/Column";
+import Container from "@/components/ui/Container";
+import { Muted } from "@/components/ui/Text";
 import CharacterSelect from "@/components/casino/CharacterSelect";
 import WagerFields from "@/components/casino/WagerFields";
 import CoinChoice from "@/components/casino/CoinChoice";
@@ -67,58 +70,57 @@ export default function CoinflipPage() {
   if (!user) return <div>Please log in first.</div>;
 
   return (
-    <div style={{ maxWidth: 720, margin: "40px auto" }}>
-      <h1>Coin Flip</h1>
-      <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          <label htmlFor="character">Character</label>
-          <CharacterSelect
-            characters={characters}
-            value={selectedIdx}
-            onChange={setSelectedIdx}
-            disabled={fetching}
+    <Container $max={720}>
+      <Column $gap="var(--space-4)">
+        <h1>Coin Flip</h1>
+        <Column as="form" onSubmit={onSubmit} $gap="var(--space-4)">
+          <Column $gap="var(--space-1)">
+            <label htmlFor="character">Character</label>
+            <CharacterSelect
+              characters={characters}
+              value={selectedIdx}
+              onChange={setSelectedIdx}
+              disabled={fetching}
+            />
+          </Column>
+
+          <WagerFields
+            gold={gold}
+            silver={silver}
+            copper={copper}
+            onChange={({ gold, silver, copper }) => {
+              setGold(gold);
+              setSilver(silver);
+              setCopper(copper);
+            }}
           />
-        </div>
 
-        <WagerFields
-          gold={gold}
-          silver={silver}
-          copper={copper}
-          onChange={({ gold, silver, copper }) => {
-            setGold(gold);
-            setSilver(silver);
-            setCopper(copper);
-          }}
-        />
+          <CoinChoice value={choice} onChange={setChoice} />
 
-        <CoinChoice value={choice} onChange={setChoice} />
+          <Row>
+            <Button type="submit" disabled={!canSubmit}>
+              {submitting ? "Flipping…" : "Flip Coin"}
+            </Button>
+            {!canSubmit && (
+              <Muted>Select character and enter wager</Muted>
+            )}
+          </Row>
+        </Column>
 
-        <Row>
-          <Button type="submit" disabled={!canSubmit}>
-            {submitting ? "Flipping…" : "Flip Coin"}
-          </Button>
-          {!canSubmit && (
-            <span style={{ color: "var(--muted)" }}>
-              Select character and enter wager
-            </span>
-          )}
-        </Row>
-      </form>
+        {fetchError && (
+          <Alert $variant="error">
+            <strong>Error:</strong> {String(fetchError.message || fetchError)}
+          </Alert>
+        )}
 
-      {fetchError && (
-        <Alert $variant="error" style={{ marginTop: 16 }}>
-          <strong>Error:</strong> {String(fetchError.message || fetchError)}
-        </Alert>
-      )}
+        {submitError && (
+          <Alert $variant="error">
+            <strong>Error:</strong> {String(submitError.message || submitError)}
+          </Alert>
+        )}
 
-      {submitError && (
-        <Alert $variant="error" style={{ marginTop: 16 }}>
-          <strong>Error:</strong> {String(submitError.message || submitError)}
-        </Alert>
-      )}
-
-      <ResultPanel result={result} />
-    </div>
+        <ResultPanel result={result} />
+      </Column>
+    </Container>
   );
 }
-

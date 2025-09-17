@@ -5,6 +5,9 @@ import { jsonPost } from "@/lib/api";
 import { toCopper } from "@/lib/currency";
 import Row from "@/components/ui/Row";
 import Alert from "@/components/ui/Alert";
+import Column from "@/components/ui/Column";
+import Container from "@/components/ui/Container";
+import { Muted } from "@/components/ui/Text";
 import CharacterSelect from "@/components/casino/CharacterSelect";
 import WagerFields from "@/components/casino/WagerFields";
 import TwoPickGrid from "@/components/casino/TwoPickGrid";
@@ -73,61 +76,62 @@ export default function TwoPickPage() {
     : undefined;
 
   return (
-    <div style={{ maxWidth: 720, margin: "40px auto" }}>
-      <h1>Two Pick</h1>
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          <label htmlFor="character">Character</label>
-          <CharacterSelect
-            characters={characters}
-            value={selectedIdx}
-            onChange={setSelectedIdx}
-            disabled={fetching}
+    <Container $max={720}>
+      <Column $gap="var(--space-4)">
+        <h1>Two Pick</h1>
+        <Column $gap="var(--space-4)">
+          <Column $gap="var(--space-1)">
+            <label htmlFor="character">Character</label>
+            <CharacterSelect
+              characters={characters}
+              value={selectedIdx}
+              onChange={setSelectedIdx}
+              disabled={fetching}
+            />
+          </Column>
+
+          <WagerFields
+            gold={gold}
+            silver={silver}
+            copper={copper}
+            onChange={({ gold, silver, copper }) => {
+              setGold(gold);
+              setSilver(silver);
+              setCopper(copper);
+            }}
           />
-        </div>
 
-        <WagerFields
-          gold={gold}
-          silver={silver}
-          copper={copper}
-          onChange={({ gold, silver, copper }) => {
-            setGold(gold);
-            setSilver(silver);
-            setCopper(copper);
-          }}
-        />
+          <Muted>
+            Wähle eines der zwei Bilder. Aktuell sind Platzhalter – die Bilder kannst du später einfügen.
+          </Muted>
 
-        <div style={{ color: "var(--muted)" }}>
-          Wähle eines der zwei Bilder. Aktuell sind Platzhalter – die Bilder kannst du später einfügen.
-        </div>
+          <TwoPickGrid
+            canSubmit={canSubmit}
+            pickedSide={pickedSide}
+            correctSide={correctSide}
+            onPick={play}
+          />
 
-        <TwoPickGrid
-          canSubmit={canSubmit}
-          pickedSide={pickedSide}
-          correctSide={correctSide}
-          onPick={play}
-        />
+          {!canSubmit && (
+            <Muted>
+              Charakter wählen und Einsatz eingeben, um zu spielen.
+            </Muted>
+          )}
+        </Column>
 
-        {!canSubmit && (
-          <div style={{ color: "var(--muted)" }}>
-            Charakter wählen und Einsatz eingeben, um zu spielen.
-          </div>
+        {fetchError && (
+          <Alert $variant="error">
+            <strong>Error:</strong> {String(fetchError.message || fetchError)}
+          </Alert>
         )}
-      </div>
+        {submitError && (
+          <Alert $variant="error">
+            <strong>Error:</strong> {String(submitError.message || submitError)}
+          </Alert>
+        )}
 
-      {fetchError && (
-        <Alert $variant="error" style={{ marginTop: 16 }}>
-          <strong>Error:</strong> {String(fetchError.message || fetchError)}
-        </Alert>
-      )}
-      {submitError && (
-        <Alert $variant="error" style={{ marginTop: 16 }}>
-          <strong>Error:</strong> {String(submitError.message || submitError)}
-        </Alert>
-      )}
-
-      <ResultPanel result={result} />
-    </div>
+        <ResultPanel result={result} />
+      </Column>
+    </Container>
   );
 }
-

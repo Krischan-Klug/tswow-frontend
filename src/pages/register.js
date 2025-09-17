@@ -2,6 +2,9 @@ import { useState } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import Container from "@/components/ui/Container";
+import Column from "@/components/ui/Column";
+import Alert from "@/components/ui/Alert";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -38,10 +41,10 @@ export default function RegisterPage() {
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: "40px auto" }}>
+    <Container $max={420}>
       <h1>Account register</h1>
       <Card>
-        <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <Column as="form" onSubmit={handleRegister} $gap="var(--space-3)">
           <Input
             type="text"
             placeholder="Username"
@@ -64,14 +67,14 @@ export default function RegisterPage() {
             required
           />
           <Button type="submit">Register</Button>
-        </form>
+        </Column>
 
         {message && (
-          <p style={{ color: message.type === "success" ? "var(--success)" : "var(--danger)", marginTop: 15 }}>
+          <Alert $variant={message.type === "success" ? "success" : "error"}>
             {message.text}
-          </p>
+          </Alert>
         )}
       </Card>
-    </div>
+    </Container>
   );
 }

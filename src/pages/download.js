@@ -2,6 +2,8 @@ import useRealmInfo from "../lib/useRealmInfo";
 import ContentWrapper from "@/components/ui/ContentWrapper";
 import NavLink from "@/components/ui/NavLink";
 import Card from "@/components/ui/Card";
+import { Center } from "@/components/ui/Text";
+import styled from "styled-components";
 
 export default function Download() {
   const { realm, loading, error } = useRealmInfo(1);
@@ -18,10 +20,16 @@ export default function Download() {
     <ContentWrapper>
       <h1>Download</h1>
       <NavLink href="https://google.com">Click here</NavLink>
-      <Card style={{ textAlign: "center" }}>
-        <h3>Realmlist:</h3>
-        <p style={{ padding: "0 50px" }}>{"set realmlist " + realm.address}</p>
+      <Card>
+        <Center>
+          <h3>Realmlist:</h3>
+          <RealmlistText>{"set realmlist " + realm.address}</RealmlistText>
+        </Center>
       </Card>
     </ContentWrapper>
   );
 }
+
+const RealmlistText = styled.p`
+  padding: 0 50px;
+`;
