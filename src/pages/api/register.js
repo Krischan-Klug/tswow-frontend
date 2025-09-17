@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   }
 
   const upstream =
-    process.env.BACKEND_URL_REGISTER || "127.0.0.1:3001/auth/register";
+    process.env.BACKEND_URL_REGISTER || "http://127.0.0.1:3001/auth/register";
 
   try {
     const r = await fetch(upstream, {

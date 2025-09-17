@@ -1,4 +1,10 @@
 import { useState } from "react";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import Container from "@/components/ui/Container";
+import Column from "@/components/ui/Column";
+import Alert from "@/components/ui/Alert";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -35,52 +41,40 @@ export default function RegisterPage() {
   };
 
   return (
-    <div
-      style={{
-        maxWidth: "400px",
-        margin: "40px auto",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
+    <Container $max={420}>
       <h1>Account register</h1>
-      <form
-        onSubmit={handleRegister}
-        style={{ display: "flex", flexDirection: "column", gap: "12px" }}
-      >
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <input
-          type="email"
-          placeholder="E-Mail"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <button type="submit">Register</button>
-      </form>
+      <Card>
+        <Column as="form" onSubmit={handleRegister} $gap="var(--space-3)">
+          <Input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+          <Input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <Input
+            type="email"
+            placeholder="E-Mail"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <Button type="submit">Register</Button>
+        </Column>
 
-      {message && (
-        <p
-          style={{
-            color: message.type === "success" ? "green" : "red",
-            marginTop: "15px",
-          }}
-        >
-          {message.text}
-        </p>
-      )}
-    </div>
+        {message && (
+          <Alert $variant={message.type === "success" ? "success" : "error"}>
+            {message.text}
+          </Alert>
+        )}
+      </Card>
+    </Container>
   );
 }

@@ -1,4 +1,13 @@
 import { useState } from "react";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import Container from "@/components/ui/Container";
+import Column from "@/components/ui/Column";
+import Row from "@/components/ui/Row";
+import Alert from "@/components/ui/Alert";
+import { Pre } from "@/components/ui/Text";
+import LogoutButton from "@/components/auth/LogoutButton";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -28,55 +37,40 @@ export default function LoginPage() {
     }
   };
 
-  const logout = async () => {
-    await fetch("/api/logout");
-    setMsg({ ok: true, text: "Logged out" });
-  };
+  const onLoggedOut = () => setMsg({ ok: true, text: "Logged out" });
 
   return (
-    <div
-      style={{
-        maxWidth: 360,
-        margin: "40px auto",
-      }}
-    >
+    <Container $max={420}>
       <h1>Login</h1>
-      <form
-        onSubmit={submit}
-        style={{ display: "flex", flexDirection: "column", gap: 12 }}
-      >
-        <input
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Username"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        <button type="submit">Login</button>
-      </form>
-      <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
-        <button onClick={me}>Who am I?</button>
-        <button onClick={logout}>Logout</button>
-      </div>
-      {msg && (
-        <pre
-          style={{
-            whiteSpace: "pre-wrap",
-            background: "#f4f4f4",
-            padding: 12,
-            borderRadius: 8,
-            marginTop: 12,
-          }}
-        >
-          <span style={{ color: msg.ok ? "green" : "red" }}>{msg.text}</span>
-        </pre>
-      )}
-    </div>
+      <Card>
+        <Column as="form" onSubmit={submit} $gap="var(--space-3)">
+          <Input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Username"
+            required
+          />
+          <Input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            required
+          />
+          <Button type="submit">Login</Button>
+        </Column>
+        <Column $gap="var(--space-3)">
+          <Row $gap="var(--space-2)">
+            <Button type="button" onClick={me}>Who am I?</Button>
+            <LogoutButton onLoggedOut={onLoggedOut} />
+          </Row>
+          {msg && (
+            <Alert $variant={msg.ok ? "success" : "error"}>
+              <Pre $wrap>{msg.text}</Pre>
+            </Alert>
+          )}
+        </Column>
+      </Card>
+    </Container>
   );
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 const useRealmInfo = (realmId) => {
-  const [realm, setRealm] = useState([]);
+  const [realm, setRealm] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -12,7 +12,7 @@ const useRealmInfo = (realmId) => {
         const response = await fetch("/api/realm", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: realmId }),
+          body: JSON.stringify({ realmId }),
         });
         const data = await response.json();
         setRealm(data);

@@ -1,36 +1,9 @@
-import Link from "next/link";
-import styled from "styled-components";
 import useRealmInfo from "../lib/useRealmInfo";
-
-const StyledLink = styled(Link)`
-  text-decoration: none;
-  color: var(--foreground);
-  font-size: 2rem;
-`;
-
-const StyledContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
-  height: 100vh;
-`;
-
-const StyledRealmlist = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
-  border: 1px solid var(--foreground);
-  border-radius: 10px;
-  margin: 10px;
-`;
-
-const StyledText = styled.p`
-  text-align: center;
-  padding-left: 50px;
-  padding-right: 50px;
-`;
+import ContentWrapper from "@/components/ui/ContentWrapper";
+import NavLink from "@/components/ui/NavLink";
+import Card from "@/components/ui/Card";
+import { Center } from "@/components/ui/Text";
+import styled from "styled-components";
 
 export default function Download() {
   const { realm, loading, error } = useRealmInfo(1);
@@ -44,14 +17,19 @@ export default function Download() {
   }
 
   return (
-    <StyledContentWrapper>
+    <ContentWrapper>
       <h1>Download</h1>
-      <StyledLink href="https://google.com">Click here</StyledLink>
-
-      <StyledRealmlist>
-        <h3>Realmlist:</h3>
-        <StyledText>{"set realmlist " + realm.address}</StyledText>
-      </StyledRealmlist>
-    </StyledContentWrapper>
+      <NavLink href="https://google.com">Click here</NavLink>
+      <Card>
+        <Center>
+          <h3>Realmlist:</h3>
+          <RealmlistText>{"set realmlist " + realm.address}</RealmlistText>
+        </Center>
+      </Card>
+    </ContentWrapper>
   );
 }
+
+const RealmlistText = styled.p`
+  padding: 0 50px;
+`;

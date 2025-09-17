@@ -5,12 +5,8 @@ export default function App({ Component, pageProps }) {
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
     setLoaded(true);
-  });
+  }, []);
 
-  if (!loaded) {
-    return <p>Loading...</p>;
-  }
-  if (loaded) {
-    return <Component {...pageProps} />;
-  }
+  if (!loaded) return <p>Loading...</p>;
+  return <Component {...pageProps} />;
 }

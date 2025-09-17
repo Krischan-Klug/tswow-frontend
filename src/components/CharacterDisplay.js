@@ -1,5 +1,8 @@
 import { useAuth } from "../lib/useAuth";
 import { useEffect, useState } from "react";
+import Card from "@/components/ui/Card";
+import Container from "@/components/ui/Container";
+import { Pre } from "@/components/ui/Text";
 
 export default function CharacterDisplay() {
   const { user, loading } = useAuth();
@@ -25,14 +28,17 @@ export default function CharacterDisplay() {
     })();
   }, [user]);
 
-  if (loading) return <p>Loading…</p>;
+  if (loading) return <p>Loading...</p>;
   if (!user) return <p>Please log in first.</p>;
   if (error) return <p>Error loading characters.</p>;
 
   return (
-    <div style={{ maxWidth: 480, margin: "40px auto" }}>
+    <Container $max={480}>
       <h1>Your Characters</h1>
-      <pre>{JSON.stringify(characters, null, 2)}</pre>
-    </div>
+      <Card>
+        <Pre>{JSON.stringify(characters, null, 2)}</Pre>
+      </Card>
+    </Container>
   );
 }
+
