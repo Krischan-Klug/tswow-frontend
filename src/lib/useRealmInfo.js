@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { jsonGet } from "./api";
 
 const useRealmInfo = (realmId) => {
   const [realm, setRealm] = useState({});
@@ -6,16 +7,14 @@ const useRealmInfo = (realmId) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (realmId == null) return;
     const fetchRealm = async () => {
       setLoading(true);
       try {
-        const response = await fetch("/api/realm", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ realmId }),
-        });
-        const data = await response.json();
-        setRealm(data);
+        const data = await jsonGet("/api/realm");
+        const list = Array.isArray(data?.realms) ? data.realms : [];
+        const found = list.find((r) => Number(r.id) === Number(realmId)) || {};
+        setRealm(found);
       } catch (error) {
         setError(error);
       } finally {
