@@ -41,7 +41,7 @@ Main API routes provided by this app (all use `BACKEND_URL` as base):
 - `POST /api/register` -> `${BACKEND_URL}/auth/register`
 - `POST /api/login` -> `${BACKEND_URL}/auth/login` (sets `auth` HttpOnly cookie, returns `{ account }`)
 - `GET  /api/me` -> `${BACKEND_URL}/auth/me` (uses the cookie as Bearer token, returns `{ account }`)
-- `POST /api/realm` -> `${BACKEND_URL}/realm/info`
+- `GET  /api/realm` -> `${BACKEND_URL}/realm` (returns `{ realms: [{ id, name, address, port, population }] }`)
 - `POST /api/character` -> `${BACKEND_URL}/character` (requires auth)
 - `GET  /api/casino/characters` -> `${BACKEND_URL}/casino/characters` (requires auth)
 - `POST /api/casino/coin-flip` -> `${BACKEND_URL}/casino/coin-flip` (requires auth)
@@ -54,6 +54,15 @@ The implementation lives under `src/pages/api/*`. Example files:
 - `src/pages/api/character.js`
 - `src/pages/api/casino/characters.js`
 - `src/pages/api/casino/coin-flip.js`
+
+### Realms Endpoint
+
+- Backend now serves `GET ${BACKEND_URL}/realm` responding with `{ realms: [{ id, name, address, port, population }] }`.
+- Frontend proxy: `GET /api/realm`.
+- Client usage:
+  - `src/lib/useRealmInfo.js` fetches `/api/realm` and selects a realm by `realmId`.
+  - `src/pages/realms.js` lists all realms using UI cards (`RealmDisplay`).
+  - `src/components/RealmDisplay.js` renders a card with name, address:port and population.
 
 ## Example: calling the backend from the client
 

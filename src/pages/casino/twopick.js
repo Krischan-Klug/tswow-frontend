@@ -3,7 +3,6 @@ import useRequireAuth from "@/lib/useRequireAuth";
 import useCharacters from "@/lib/useCharacters";
 import { jsonPost } from "@/lib/api";
 import { toCopper } from "@/lib/currency";
-import Row from "@/components/ui/Row";
 import Alert from "@/components/ui/Alert";
 import Column from "@/components/ui/Column";
 import Container from "@/components/ui/Container";
@@ -15,7 +14,13 @@ import ResultPanel from "@/components/casino/ResultPanel";
 
 export default function TwoPickPage() {
   const { user, loading } = useRequireAuth("/casino/twopick");
-  const { characters, loading: fetching, error: fetchError, refresh, updateBalance } = useCharacters({
+  const {
+    characters,
+    loading: fetching,
+    error: fetchError,
+    refresh,
+    updateBalance,
+  } = useCharacters({
     enabled: !!user,
   });
   const [selectedIdx, setSelectedIdx] = useState(0);
@@ -34,13 +39,18 @@ export default function TwoPickPage() {
   const selectedRef = useRef(null);
   useEffect(() => {
     if (selectedChar) {
-      selectedRef.current = { realmId: selectedChar.realmId, guid: selectedChar.guid };
+      selectedRef.current = {
+        realmId: selectedChar.realmId,
+        guid: selectedChar.guid,
+      };
     }
   }, [selectedChar]);
   useEffect(() => {
     const id = selectedRef.current;
     if (!id || !characters?.length) return;
-    const idx = characters.findIndex((c) => c.realmId === id.realmId && c.guid === id.guid);
+    const idx = characters.findIndex(
+      (c) => c.realmId === id.realmId && c.guid === id.guid
+    );
     if (idx >= 0 && idx !== selectedIdx) setSelectedIdx(idx);
   }, [characters]);
 
@@ -90,9 +100,11 @@ export default function TwoPickPage() {
   if (loading) return <div>Loading...</div>;
   if (!user) return <div>Please log in first.</div>;
 
-  const pickedSide = choice === "heads" ? "left" : choice === "tails" ? "right" : undefined;
+  const pickedSide =
+    choice === "heads" ? "left" : choice === "tails" ? "right" : undefined;
   const out = result?.outcome;
-  const correctSide = out === "heads" ? "left" : out === "tails" ? "right" : undefined;
+  const correctSide =
+    out === "heads" ? "left" : out === "tails" ? "right" : undefined;
 
   return (
     <Container $max={720}>
@@ -120,10 +132,6 @@ export default function TwoPickPage() {
             }}
           />
 
-          <Muted>
-            Waehle eines der zwei Bilder. Aktuell sind Platzhalter - die Bilder kannst du spaeter einfuegen.
-          </Muted>
-
           <TwoPickGrid
             key={round}
             canSubmit={canSubmit}
@@ -132,9 +140,7 @@ export default function TwoPickPage() {
             onPick={play}
           />
 
-          {!canSubmit && (
-            <Muted>Charakter waehlen und Einsatz eingeben, um zu spielen.</Muted>
-          )}
+          {!canSubmit && <Muted>Please select a character and a wager.</Muted>}
         </Column>
 
         {fetchError && (
