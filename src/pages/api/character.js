@@ -7,8 +7,8 @@ export default async function handler(req, res) {
   const token = m ? decodeURIComponent(m[1]) : null;
   if (!token) return res.status(401).json({ error: "not logged in" });
 
-  const upstream =
-    process.env.BACKEND_URL_CHARACTER || "http://127.0.0.1:3001/character";
+  const base = process.env.BACKEND_URL || "http://127.0.0.1:3001";
+  const upstream = `${base}/character`;
 
   try {
     const r = await fetch(upstream, {

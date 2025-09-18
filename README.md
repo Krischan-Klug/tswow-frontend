@@ -22,16 +22,9 @@ Next.js frontend for TSWoW. Uses the TSWoW backend for authentication and data a
 
 ## Environment Variables
 
-Set these in `.env.local` (defaults shown in parentheses):
+Set this in `.env.local` (default shown in parentheses):
 
-- `BACKEND_URL_REGISTER` (http://127.0.0.1:3001/auth/register)
-- `BACKEND_URL_LOGIN` (http://127.0.0.1:3001/auth/login)
-- `BACKEND_URL_ME` (http://127.0.0.1:3001/auth/me)
-- `BACKEND_URL_REALM` (http://127.0.0.1:3001/realm/info)
-- `BACKEND_URL_CHARACTER` (http://127.0.0.1:3001/character)
-- `BACKEND_URL_CASINO_COIN_FLIP` (http://127.0.0.1:3001/casino/coin-flip)
-- `BACKEND_URL_CASINO_CHARACTERS` (optional; defaults to `${BASE}/casino/characters` if not set)
-- `NEXT_PUBLIC_BACKEND_URL` (optional; used by some API routes to derive defaults)
+- `BACKEND_URL` (http://127.0.0.1:3001)
 
 Tip: You should not call the backend directly from the browser. Keep backend URLs in server-only environment variables and use the app's `/api/*` routes from the client.
 
@@ -43,15 +36,15 @@ The browser never calls the backend directly. Instead, it calls Next.js API rout
 - Secure login using an `HttpOnly` cookie for the JWT (set by `/api/login`)
 - Avoids CORS and avoids browser mixed-content issues
 
-Main API routes provided by this app:
+Main API routes provided by this app (all use `BACKEND_URL` as base):
 
-- `POST /api/register` -> proxies to `BACKEND_URL_REGISTER`
-- `POST /api/login` -> proxies to `BACKEND_URL_LOGIN`, sets `auth` HttpOnly cookie, returns `{ account }`
-- `GET  /api/me` -> proxies to `BACKEND_URL_ME` using the cookie as Bearer token, returns `{ account }`
-- `POST /api/realm` -> proxies to `BACKEND_URL_REALM`
-- `POST /api/character` -> proxies to `BACKEND_URL_CHARACTER` (requires auth)
-- `GET  /api/casino/characters` -> proxies to casino characters endpoint (requires auth)
-- `POST /api/casino/coin-flip` -> proxies to `BACKEND_URL_CASINO_COIN_FLIP` (requires auth)
+- `POST /api/register` -> `${BACKEND_URL}/auth/register`
+- `POST /api/login` -> `${BACKEND_URL}/auth/login` (sets `auth` HttpOnly cookie, returns `{ account }`)
+- `GET  /api/me` -> `${BACKEND_URL}/auth/me` (uses the cookie as Bearer token, returns `{ account }`)
+- `POST /api/realm` -> `${BACKEND_URL}/realm/info`
+- `POST /api/character` -> `${BACKEND_URL}/character` (requires auth)
+- `GET  /api/casino/characters` -> `${BACKEND_URL}/casino/characters` (requires auth)
+- `POST /api/casino/coin-flip` -> `${BACKEND_URL}/casino/coin-flip` (requires auth)
 
 The implementation lives under `src/pages/api/*`. Example files:
 

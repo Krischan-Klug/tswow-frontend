@@ -3,8 +3,8 @@ export default async function handler(req, res) {
   if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
 
-  const upstream =
-    process.env.BACKEND_URL_LOGIN || "http://127.0.0.1:3001/auth/login";
+  const base = process.env.BACKEND_URL || "http://127.0.0.1:3001";
+  const upstream = `${base}/auth/login`;
 
   try {
     const r = await fetch(upstream, {
@@ -23,10 +23,10 @@ export default async function handler(req, res) {
 
     const isProd = process.env.NODE_ENV === "production";
     const maxAge = 60 * 60 * 24; // 1 day
-    const base = `auth=${encodeURIComponent(
+    const cookieBase = `auth=${encodeURIComponent(
       data.token
     )}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${maxAge}`;
-    res.setHeader("Set-Cookie", isProd ? `${base}; Secure` : base);
+    res.setHeader("Set-Cookie", isProd ? `${cookieBase}; Secure` : cookieBase);
 
     return res.status(200).json({ account: data.account });
   } catch {
