@@ -64,11 +64,16 @@ export default function CoinflipPage() {
     setSubmitError(null);
     setResult(null);
     try {
+      // Backend expects boolean (also accepts "true"/"false")
+      const choiceBool =
+        typeof choice === "boolean"
+          ? choice
+          : choice === "heads" || choice === "true" || choice === "left";
       const body = {
         realmId: selectedChar.realmId,
         characterGuid: selectedChar.guid,
         wagerCopper,
-        choice,
+        choice: choiceBool,
       };
       const data = await jsonPost("/api/casino/coin-flip", body);
       const res = data?.result || data;

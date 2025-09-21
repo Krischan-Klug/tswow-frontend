@@ -74,11 +74,16 @@ export default function TwoPickPage() {
     setResult(null);
     setChoice(picked);
     try {
+      // Backend expects boolean (also accepts "true"/"false").
+      const choiceBool =
+        typeof picked === "boolean"
+          ? picked
+          : picked === "heads" || picked === "true" || picked === "left";
       const body = {
         realmId: selectedChar.realmId,
         characterGuid: selectedChar.guid,
         wagerCopper,
-        choice: picked, // reuse coin-flip API: "heads" | "tails"
+        choice: choiceBool,
       };
       const data = await jsonPost("/api/casino/coin-flip", body);
       const res = data?.result || data;
@@ -100,11 +105,22 @@ export default function TwoPickPage() {
   if (loading) return <div>Loading...</div>;
   if (!user) return <div>Please log in first.</div>;
 
+  const toBool = (v) =>
+    typeof v === "boolean"
+      ? v
+      : v === "heads" || v === "true" || v === "left"
+      ? true
+      : v === "tails" || v === "false" || v === "right"
+      ? false
+      : undefined;
+
+  const choiceBool = toBool(choice);
   const pickedSide =
-    choice === "heads" ? "left" : choice === "tails" ? "right" : undefined;
+    typeof choiceBool === "undefined" ? undefined : choiceBool ? "left" : "right";
   const out = result?.outcome;
+  const outcomeBool = toBool(out);
   const correctSide =
-    out === "heads" ? "left" : out === "tails" ? "right" : undefined;
+    typeof outcomeBool === "undefined" ? undefined : outcomeBool ? "left" : "right";
 
   return (
     <Container $max={720}>
